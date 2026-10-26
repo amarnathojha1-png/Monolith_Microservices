@@ -1,7 +1,7 @@
 import { orders, type Order } from "./repo.ts";
 import { reserve } from "../inventory/index.ts";
 import { charge } from "../payments/index.ts";
-import { send } from "../notifications/index.ts";
+import { eventBus } from "../../platform/event-bus.ts";
 
 export type PlaceResult =
   | { ok: true; orderId: string; amountPaise: number }
@@ -27,7 +27,7 @@ export function placeOrder({ sku, qty, unitPaise, email }: PlaceInput): PlaceRes
   const id = `ord_${++n}`;
   orders().set(id, { id, sku, qty, amountPaise, chargeId: c.chargeId });
 
-  send(email, `Order ${id} confirmed`);
+  eventBus.publish("order.placed", { orderId: id, email, amountPaise });
 
   return { ok: true, orderId: id, amountPaise };
 }
