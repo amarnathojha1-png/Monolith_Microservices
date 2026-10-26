@@ -1,6 +1,11 @@
 import { outbox, type Message } from "./repo.ts";
+import { eventBus } from "../../platform/event-bus.ts";
 
 let n = 0;
+
+eventBus.subscribe("order.placed", ({ orderId, email }) => {
+  send(email, `Order ${orderId} confirmed`);
+});
 
 export function send(to: string, subject: string): string {
   const id = `msg_${++n}`;
